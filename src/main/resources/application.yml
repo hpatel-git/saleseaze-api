@@ -1,0 +1,42 @@
+server:
+  port: 8900
+
+spring:
+  application:
+    name: saleseaze-api
+  data:
+    mongodb:
+      uri: mongodb://${MONGODB_HOST:localhost}:${MONGODB_PORT:27017}/saleseazedb
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+
+management:
+  endpoints:
+    web:
+      exposure.include: beans, env, health, info, metrics, mappings
+  endpoint:
+    health:
+      show-details: always
+
+keycloak:
+  auth-server-url: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth
+  realm: company-services
+  resource: saleseaze-app
+  ssl-required: external
+  principal-attribute: preferred_username
+  use-resource-role-mappings: true
+
+keycloak-admin:
+  user-name: ${KEYCLOAK_ADMIN_USER_NAME:admin}
+  pwd: ${KEYCLOAK_ADMIN_PWD:admin}
+  client-id: admin-cli
+  realm: master
+
+
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    groups-order: DESC
+    disable-swagger-default-url: false
