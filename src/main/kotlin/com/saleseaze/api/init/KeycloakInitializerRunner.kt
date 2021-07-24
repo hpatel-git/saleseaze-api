@@ -1,5 +1,7 @@
 package com.saleseaze.api.init
 
+import com.saleseaze.api.config.KeycloakConfig
+import com.saleseaze.api.config.SaleseazeConfig
 import com.saleseaze.api.utils.ApplicationRoles
 import mu.KLogging
 import org.keycloak.admin.client.Keycloak
@@ -7,8 +9,8 @@ import org.keycloak.admin.client.KeycloakBuilder
 import org.keycloak.representations.idm.ClientRepresentation
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.RealmRepresentation
+import org.keycloak.representations.idm.RoleRepresentation
 import org.keycloak.representations.idm.UserRepresentation
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,73 +18,56 @@ import java.util.*
 
 
 @Configuration
-class KeycloakInitializerRunner {
+class KeycloakInitializerRunner(
+    val keycloakConfig: KeycloakConfig,
+    val saleseazeConfig: SaleseazeConfig,
+    val keycloakAdmin: Keycloak
+) {
     companion object : KLogging()
-
-    private val COMPANY_SERVICE_REALM_NAME = "company-services"
-    private val SALESEAZE_APP_CLIENT_ID = "saleseaze-app"
-    private val SALESEAZE_APP_ROLES: List<String> = listOf(
-        ApplicationRoles.SALESEAZE_USER,
-        ApplicationRoles.SALESEAZE_MANAGER
-    )
-    private val SALESEAZE_APP_REDIRECT_URL = "http://localhost:3000/*"
-    private val SALESEAZE_APP_USERS: List<UserPass> = arrayListOf(
-        UserPass("admin", "admin"),
-        UserPass("user", "user")
-    )
 
     @Bean
     fun init(
-        @Value("\${keycloak.auth-server-url}")
-        keycloakServerUrl: String,
-        keycloakAdmin: Keycloak
+
     ) = CommandLineRunner {
-        logger.info("Initializing '${COMPANY_SERVICE_REALM_NAME}' realm in Keycloak ...")
+        logger.info("Initializing '${keycloakConfig.realm}' realm in Keycloak ...")
         val representationOptional: Optional<RealmRepresentation> =
             keycloakAdmin.realms().findAll().stream()
-                .filter { r -> r.realm.equals(COMPANY_SERVICE_REALM_NAME) }
+                .filter { r -> r.realm.equals(keycloakConfig.realm) }
                 .findAny()
         if (!representationOptional.isPresent) {
             val realmRepresentation = RealmRepresentation()
-            realmRepresentation.realm = COMPANY_SERVICE_REALM_NAME
+            realmRepresentation.realm = keycloakConfig.realm
             realmRepresentation.isEnabled = true
             realmRepresentation.isRegistrationAllowed = true
+            val defaultRole = RoleRepresentation()
+            defaultRole.name = ApplicationRoles.SALESEAZE_USER.name
+            defaultRole.isComposite = false
+            defaultRole.clientRole = true
+            realmRepresentation.defaultRole = defaultRole
 
-            // Client
-
-            // Client
             val clientRepresentation = ClientRepresentation()
-            clientRepresentation.clientId = SALESEAZE_APP_CLIENT_ID
+            clientRepresentation.clientId = keycloakConfig.resource
             clientRepresentation.isDirectAccessGrantsEnabled = true
-            clientRepresentation.setDefaultRoles(
-                arrayOf(
-                    SALESEAZE_APP_ROLES[0]
-                )
-            )
             clientRepresentation.isPublicClient = true
-            clientRepresentation.redirectUris = listOf(SALESEAZE_APP_REDIRECT_URL)
+            clientRepresentation.redirectUris =
+                listOf(saleseazeConfig.redirectUrl)
             realmRepresentation.clients = listOf(clientRepresentation)
 
-            // Users
-            // Users
-            val userRepresentations = SALESEAZE_APP_USERS.map {
+            val userRepresentations = saleseazeConfig.defaultUsers.map {
                 val clientRoles: MutableMap<String, List<String>> =
                     HashMap()
-                if ("admin" == it.userName) {
-                    clientRoles[SALESEAZE_APP_CLIENT_ID] = SALESEAZE_APP_ROLES
-                } else {
-                    clientRoles[SALESEAZE_APP_CLIENT_ID] = listOf(
-                        SALESEAZE_APP_ROLES[0]
-                    )
-                }
+                clientRoles[
+                        keycloakConfig.resource
+                ] = determineRolesByUserName(it.key)
+
                 val credentialRepresentation = CredentialRepresentation()
                 credentialRepresentation.type =
                     CredentialRepresentation.PASSWORD
-                credentialRepresentation.value = it.password
+                credentialRepresentation.value = it.value
 
                 // User
                 val userRepresentation = UserRepresentation()
-                userRepresentation.username = it.userName
+                userRepresentation.username = it.key
                 userRepresentation.isEnabled = true
                 userRepresentation.credentials =
                     listOf(credentialRepresentation)
@@ -93,31 +78,44 @@ class KeycloakInitializerRunner {
             keycloakAdmin.realms().create(realmRepresentation)
 
         } else {
-            logger.info(
-                "Realm '{}' already pre-configured",
-                COMPANY_SERVICE_REALM_NAME
-            )
+            logger.info("Realm '{}' already configured", keycloakConfig.realm)
         }
 
-        val admin = SALESEAZE_APP_USERS[0]
-        logger.info("Testing getting token for '{}' ...", admin.userName)
+        val admin = saleseazeConfig.defaultUsers.entries.first()
+        logger.info("Testing getting token for '{}' ...", admin.key)
 
         val keycloakMovieApp =
-            KeycloakBuilder.builder().serverUrl(keycloakServerUrl)
-                .realm(COMPANY_SERVICE_REALM_NAME).username(admin.userName)
-                .password(admin.password)
-                .clientId(SALESEAZE_APP_CLIENT_ID).build()
+            KeycloakBuilder.builder().serverUrl(keycloakConfig.authServerUrl)
+                .realm(keycloakConfig.realm).username(admin.key)
+                .password(admin.value)
+                .clientId(keycloakConfig.resource).build()
 
         logger.info(
             "'{}' token: {}",
-            admin.userName,
+            admin.key,
             keycloakMovieApp.tokenManager().grantToken().token
         )
         logger.info(
             "'{}' initialization completed successfully!",
-            COMPANY_SERVICE_REALM_NAME
+            keycloakConfig.realm
         )
+    }
+
+    fun determineRolesByUserName(userName: String) = when {
+        userName.contains("super", true) -> ApplicationRoles
+            .values().map { role -> role.name }
+        userName.contains("admin", true) -> listOf(
+            ApplicationRoles.SALESEAZE_MANAGER
+                .name
+        )
+        userName.contains("user", true) -> listOf(
+            ApplicationRoles.SALESEAZE_USER
+                .name
+        )
+        else -> listOf(ApplicationRoles.SALESEAZE_USER.name)
     }
 }
 
-data class UserPass(val userName: String, val password: String)
+
+
+

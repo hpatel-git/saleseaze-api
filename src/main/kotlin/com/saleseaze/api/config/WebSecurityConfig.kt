@@ -50,11 +50,17 @@ class WebSecurityConfig : KeycloakWebSecurityConfigurerAdapter() {
                 "/actuator/**"
             ).permitAll()
             .antMatchers("/api/movies/**/comments")
-            .hasAnyRole(ApplicationRoles.SALESEAZE_MANAGER, ApplicationRoles.SALESEAZE_USER)
+            .hasAnyRole(
+                ApplicationRoles.SALESEAZE_MANAGER.name,
+                ApplicationRoles.SALESEAZE_USER.name
+            )
             .antMatchers("/api/movies", "/api/movies/**")
-            .hasRole(ApplicationRoles.SALESEAZE_MANAGER)
+            .hasRole(ApplicationRoles.SALESEAZE_MANAGER.name)
             .antMatchers("/api/userextras/me")
-            .hasAnyRole(ApplicationRoles.SALESEAZE_MANAGER, ApplicationRoles.SALESEAZE_USER)
+            .hasAnyRole(
+                ApplicationRoles.SALESEAZE_MANAGER.name,
+                ApplicationRoles.SALESEAZE_USER.name
+            )
             .antMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .antMatchers(
                 "/swagger-ui.html",

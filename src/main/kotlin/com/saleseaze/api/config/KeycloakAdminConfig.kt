@@ -1,4 +1,4 @@
-package com.saleseaze.api.init
+package com.saleseaze.api.config
 
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
