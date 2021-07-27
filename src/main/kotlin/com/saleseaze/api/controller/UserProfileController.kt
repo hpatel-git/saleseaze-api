@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 
 @RestController
@@ -43,7 +44,7 @@ class UserProfileController(
     @PutMapping("/me")
     fun updateMyProfile(
             principal: KeycloakAuthenticationToken,
-        @RequestBody userProfileUpdateRequest: UserProfileUpdateRequest
+        @Valid @RequestBody userProfileUpdateRequest: UserProfileUpdateRequest
     ) {
         userProfileUpdateRequest.userId = principal
             .account
