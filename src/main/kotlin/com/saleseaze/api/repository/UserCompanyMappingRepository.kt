@@ -7,5 +7,6 @@ import java.util.UUID
 interface UserCompanyMappingRepository :
     CrudRepository<UserCompanyMapping, UUID> {
     fun findAllByCompanyId(companyId: UUID): List<UserCompanyMapping>
+    fun findAllByCompanyIdAndUserId(companyId: UUID, userId: String): List<UserCompanyMapping>
     fun findAllByUserId(userId: String): List<UserCompanyMapping>
 }

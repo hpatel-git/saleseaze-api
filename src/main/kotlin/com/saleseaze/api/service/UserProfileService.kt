@@ -2,6 +2,7 @@ package com.saleseaze.api.service
 
 import com.saleseaze.api.config.KeycloakConfig
 import com.saleseaze.api.exception.InvalidDataException
+import com.saleseaze.api.model.UserProfileResponse
 import com.saleseaze.api.model.UserProfileUpdateRequest
 import com.saleseaze.api.utils.ApplicationConstants.USER_EXTRA_ATTRIBUTE_ABOUT_ME
 import com.saleseaze.api.utils.ApplicationConstants.USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY
@@ -13,7 +14,6 @@ import com.saleseaze.api.utils.ApplicationConstants.USER_EXTRA_ATTRIBUTE_REGISTR
 import com.saleseaze.api.utils.ApplicationRoles
 import com.saleseaze.api.utils.KeycloakUtils
 import org.keycloak.admin.client.Keycloak
-import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -26,8 +26,8 @@ class UserProfileService(
     val companyMappingService: UserCompanyMappingService
 ) {
 
-    fun getUserProfile(userId: String): UserRepresentation {
-        return keycloakAdmin
+    fun getUserProfile(userId: String): UserProfileResponse {
+        val userProfile = keycloakAdmin
             .realms()
             .realm(keycloakConfig.realm)
             .users()
@@ -35,6 +35,30 @@ class UserProfileService(
             ?: throw InvalidDataException(
                 "User $userId does not exists"
             )
+        val response = UserProfileResponse(
+            userProfile = userProfile
+        )
+
+        if (userProfile.attributes.containsKey
+                (USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY)
+        ) {
+            val companyId = userProfile
+                .attributes[USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY]?.get(0)
+            companyId?.let {
+                val companyUUID = UUID.fromString(it)
+                response.company = companyService.findByCompanyId(companyUUID)
+                    .orElseThrow {
+                        InvalidDataException(
+                            "Company id $it does not exists.Please check with admin"
+                        )
+                    }
+                response.userCompanyMappings = companyMappingService
+                    .findAllByCompanyIdAndUserId(
+                        companyUUID, userId
+                    )
+            }
+        }
+        return response
     }
 
     fun updateUserProfile(updateUserReq: UserProfileUpdateRequest) {
@@ -96,8 +120,10 @@ class UserProfileService(
         userPresentation.isEmailVerified =
             userPresentation.email != updateUserReq.email
         userPresentation.email = updateUserReq.email
-        userPresentation.singleAttribute(USER_EXTRA_ATTRIBUTE_PHONE_NUMBER,
-            updateUserReq.phoneNumber)
+        userPresentation.singleAttribute(
+            USER_EXTRA_ATTRIBUTE_PHONE_NUMBER,
+            updateUserReq.phoneNumber
+        )
         userPresentation.singleAttribute(
             USER_EXTRA_ATTRIBUTE_CITY, updateUserReq.city
         )

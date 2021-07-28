@@ -12,6 +12,16 @@ class UserCompanyMappingService(
     private val userCompanyMappingRepository: UserCompanyMappingRepository,
     private val keycloakUtils: KeycloakUtils
 ) {
+    fun findAllByCompanyIdAndUserId(
+        companyId: UUID,
+        userId: String
+    ): List<UserCompanyMapping> {
+        return userCompanyMappingRepository
+            .findAllByCompanyIdAndUserId(
+                companyId, userId
+            )
+    }
+
     fun createUserCompanyMapping(
         userId: String,
         companyId: UUID,

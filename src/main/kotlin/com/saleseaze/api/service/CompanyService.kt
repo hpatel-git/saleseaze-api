@@ -18,7 +18,9 @@ class CompanyService(
     fun findByCompanyName(companyName: String): Optional<Company> {
         return companyRepository.findByCompanyName(companyName)
     }
-
+    fun findByCompanyId(companyId: UUID): Optional<Company> {
+        return companyRepository.findById(companyId)
+    }
     fun createCompany(userCompanyDetails: UserCompanyDetails): Company {
         findByCompanyName(userCompanyDetails.companyName).orElseThrow {
             InvalidDataException(

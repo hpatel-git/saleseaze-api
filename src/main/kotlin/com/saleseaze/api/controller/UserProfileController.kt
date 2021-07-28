@@ -1,5 +1,6 @@
 package com.saleseaze.api.controller
 
+import com.saleseaze.api.model.UserProfileResponse
 import com.saleseaze.api.model.UserProfileUpdateRequest
 import com.saleseaze.api.service.UserProfileService
 import com.saleseaze.api.utils.ApplicationConstants
@@ -29,7 +30,7 @@ class UserProfileController(
     @GetMapping("/me")
     fun getMyProfile(
         principal: KeycloakAuthenticationToken
-    ): UserRepresentation {
+    ): UserProfileResponse {
         return userProfileService.getUserProfile(
             principal.account.keycloakSecurityContext
                 .token.subject
