@@ -45,21 +45,21 @@ class WebSecurityConfig : KeycloakWebSecurityConfigurerAdapter() {
         http.authorizeRequests()
             .antMatchers(
                 HttpMethod.GET,
-                "/api/movies",
-                "/api/movies/**",
+                "/api/v1",
+                "/api/v1/**",
                 "/actuator/**"
             ).permitAll()
-            .antMatchers("/api/movies/**/comments")
+            .antMatchers("/api/v1/**/comments")
             .hasAnyRole(
                 ApplicationRoles.SALESEAZE_MANAGER.name,
-                ApplicationRoles.SALESEAZE_USER.name
+                ApplicationRoles.SALESEAZE_USER.name,
+                ApplicationRoles.SALESEAZE_SUPER_ADMIN.name
             )
-            .antMatchers("/api/movies", "/api/movies/**")
-            .hasRole(ApplicationRoles.SALESEAZE_MANAGER.name)
-            .antMatchers("/api/userextras/me")
+            .antMatchers("/api/v1", "/api/v1/**")
             .hasAnyRole(
                 ApplicationRoles.SALESEAZE_MANAGER.name,
-                ApplicationRoles.SALESEAZE_USER.name
+                ApplicationRoles.SALESEAZE_USER.name,
+                ApplicationRoles.SALESEAZE_SUPER_ADMIN.name
             )
             .antMatchers(HttpMethod.GET, "/actuator/**").permitAll()
             .antMatchers(

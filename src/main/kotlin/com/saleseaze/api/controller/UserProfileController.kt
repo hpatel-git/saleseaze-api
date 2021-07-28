@@ -43,7 +43,7 @@ class UserProfileController(
     )
     @PutMapping("/me")
     fun updateMyProfile(
-            principal: KeycloakAuthenticationToken,
+        principal: KeycloakAuthenticationToken,
         @Valid @RequestBody userProfileUpdateRequest: UserProfileUpdateRequest
     ) {
         userProfileUpdateRequest.userId = principal

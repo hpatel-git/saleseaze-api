@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration
 class SwaggerConfig {
     @Value("\${spring.application.name}")
     private val applicationName: String? = null
+
     @Bean
     fun customOpenAPI(): OpenAPI {
         return OpenAPI()

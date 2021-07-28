@@ -1,22 +1,22 @@
 package com.saleseaze.api.exception.handler
 
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import com.saleseaze.api.exception.InvalidUserException
+import com.saleseaze.api.exception.InvalidDataException
 import com.saleseaze.api.model.ApplicationError
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import java.util.*
+import java.util.Locale
 
 @RestControllerAdvice
 class ApplicationExceptionHandler {
 
-    @ExceptionHandler(value = [(InvalidUserException::class)])
+    @ExceptionHandler(value = [(InvalidDataException::class)])
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleUserAlreadyExists(ex: InvalidUserException): ApplicationError {
+    fun handleUserAlreadyExists(ex: InvalidDataException): ApplicationError {
         return ApplicationError(
             HttpStatus.BAD_REQUEST.value(), ex.message ?: "Validation error"
         )

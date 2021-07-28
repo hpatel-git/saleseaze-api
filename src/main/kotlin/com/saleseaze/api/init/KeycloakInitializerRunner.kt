@@ -14,7 +14,7 @@ import org.keycloak.representations.idm.UserRepresentation
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.util.*
+import java.util.Optional
 
 
 @Configuration
@@ -40,7 +40,7 @@ class KeycloakInitializerRunner(
             realmRepresentation.isEnabled = true
             realmRepresentation.isRegistrationAllowed = true
             val defaultRole = RoleRepresentation()
-            defaultRole.name = ApplicationRoles.SALESEAZE_USER.name
+            defaultRole.name = ApplicationRoles.SALESEAZE_MANAGER.name
             defaultRole.isComposite = false
             defaultRole.clientRole = true
             realmRepresentation.defaultRole = defaultRole
@@ -84,7 +84,7 @@ class KeycloakInitializerRunner(
         val admin = saleseazeConfig.defaultUsers.entries.first()
         logger.info("Testing getting token for '{}' ...", admin.key)
 
-        val keycloakMovieApp =
+        val keycloakApp =
             KeycloakBuilder.builder().serverUrl(keycloakConfig.authServerUrl)
                 .realm(keycloakConfig.realm).username(admin.key)
                 .password(admin.value)
@@ -93,7 +93,7 @@ class KeycloakInitializerRunner(
         logger.info(
             "'{}' token: {}",
             admin.key,
-            keycloakMovieApp.tokenManager().grantToken().token
+            keycloakApp.tokenManager().grantToken().token
         )
         logger.info(
             "'{}' initialization completed successfully!",

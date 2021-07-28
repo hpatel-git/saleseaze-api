@@ -26,7 +26,7 @@ keycloak:
   resource: saleseaze-app
   ssl-required: external
   principal-attribute: preferred_username
-  use-resource-role-mappings: true
+  use-resource-role-mappings: false
 
 saleseaze:
   redirect-url: http://localhost:3000/*
@@ -48,5 +48,4 @@ springdoc:
   swagger-ui:
     groups-order: DESC
     disable-swagger-default-url: false
-
 
