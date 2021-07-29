@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import java.util.Optional
 import java.util.UUID
 
-interface CompanyRepository : CrudRepository<Company, UUID> {
+interface CompanyRepository : CrudRepository<Company, String> {
     fun findByCompanyName(companyName: String): Optional<Company>
 }

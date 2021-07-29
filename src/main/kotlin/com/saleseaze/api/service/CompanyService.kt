@@ -8,7 +8,7 @@ import com.saleseaze.api.utils.KeycloakUtils
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Optional
-import java.util.UUID
+
 
 @Service
 class CompanyService(
@@ -18,16 +18,17 @@ class CompanyService(
     fun findByCompanyName(companyName: String): Optional<Company> {
         return companyRepository.findByCompanyName(companyName)
     }
-    fun findByCompanyId(companyId: UUID): Optional<Company> {
+    fun findByCompanyId(companyId: String): Optional<Company> {
         return companyRepository.findById(companyId)
     }
     fun createCompany(userCompanyDetails: UserCompanyDetails): Company {
-        findByCompanyName(userCompanyDetails.companyName).orElseThrow {
-            InvalidDataException(
+        findByCompanyName(userCompanyDetails.companyName).ifPresent {
+            throw InvalidDataException(
                 "Company Name ${userCompanyDetails.companyName} " +
                         " already exists"
             )
         }
+
         val company = Company(
             companyName = userCompanyDetails.companyName,
             address = userCompanyDetails.address,
@@ -43,7 +44,7 @@ class CompanyService(
     }
 
     fun updateCompany(
-        companyId: UUID,
+        companyId: String,
         userCompanyDetails: UserCompanyDetails
     ): Company {
         val existingCompany = companyRepository.findById(companyId)

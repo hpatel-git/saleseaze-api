@@ -9,9 +9,9 @@ import java.util.UUID
 @Document
 data class UserCompanyMapping(
     @Id
-    val id: UUID? = null,
+    val id: String? = null,
     @Indexed
-    val companyId: UUID,
+    val companyId: String,
     @Indexed
     val userId: String,
     val userRole: String,

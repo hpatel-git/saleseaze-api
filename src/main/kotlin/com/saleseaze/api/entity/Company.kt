@@ -8,7 +8,7 @@ import java.util.UUID
 @Document
 data class Company(
     @Id
-    val id: UUID? = null,
+    val id: String? = null,
     val companyName: String,
     var address: String,
     var city: String,

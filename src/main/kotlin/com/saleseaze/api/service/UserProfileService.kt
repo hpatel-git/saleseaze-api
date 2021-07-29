@@ -15,7 +15,6 @@ import com.saleseaze.api.utils.ApplicationRoles
 import com.saleseaze.api.utils.KeycloakUtils
 import org.keycloak.admin.client.Keycloak
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class UserProfileService(
@@ -45,8 +44,7 @@ class UserProfileService(
             val companyId = userProfile
                 .attributes[USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY]?.get(0)
             companyId?.let {
-                val companyUUID = UUID.fromString(it)
-                response.company = companyService.findByCompanyId(companyUUID)
+                response.company = companyService.findByCompanyId(it)
                     .orElseThrow {
                         InvalidDataException(
                             "Company id $it does not exists.Please check with admin"
@@ -54,7 +52,7 @@ class UserProfileService(
                     }
                 response.userCompanyMappings = companyMappingService
                     .findAllByCompanyIdAndUserId(
-                        companyUUID, userId
+                        it, userId
                     )
             }
         }
@@ -87,7 +85,7 @@ class UserProfileService(
                 .attributes.contains(USER_EXTRA_ATTRIBUTE_REGISTRATION_COMPLETE)
                     && userPresentation
                 .attributes.contains(USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY)
-            if (isRegistrationComplete) {
+            if (!isRegistrationComplete) {
                 // Create Company and assigned to user
                 val createdCompany =
                     companyService.createCompany(updateUserReq.companyDetails)
@@ -108,9 +106,8 @@ class UserProfileService(
                 val companyIdList: MutableList<String>? = userPresentation
                     .attributes[USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY]
                 companyIdList?.let {
-                    val companyId = UUID.fromString(companyIdList[0])
                     companyService.updateCompany(
-                        companyId, updateUserReq.companyDetails
+                        companyIdList[0], updateUserReq.companyDetails
                     )
                 }
             }
