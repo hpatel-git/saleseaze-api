@@ -81,7 +81,8 @@ class UserProfileService(
                 .contains(ApplicationRoles.SALESEAZE_MANAGER.name)
             && updateUserReq.companyDetails != null
         ) {
-            val isRegistrationComplete = userPresentation
+            val isRegistrationComplete = userPresentation.attributes != null
+                    && userPresentation
                 .attributes.contains(USER_EXTRA_ATTRIBUTE_REGISTRATION_COMPLETE)
                     && userPresentation
                 .attributes.contains(USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY)
