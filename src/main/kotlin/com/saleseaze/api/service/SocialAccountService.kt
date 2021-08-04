@@ -4,9 +4,11 @@ import com.saleseaze.api.entity.SocialAccount
 import com.saleseaze.api.exception.InvalidDataException
 import com.saleseaze.api.model.RegisterSocialAccount
 import com.saleseaze.api.repository.SocialAccountRepository
+import com.saleseaze.api.utils.ApplicationRoles
 import com.saleseaze.api.utils.KeycloakUtils
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class SocialAccountService(
@@ -24,8 +26,8 @@ class SocialAccountService(
             )
         }
         userProfile.company?.id?.let {
-            return socialAccountRepository.findAllByCompanyId(
-                it
+            return socialAccountRepository.findAllByCompanyIdAndIsDeleted(
+                it, false
             )
         }
         return emptyList()
@@ -48,8 +50,8 @@ class SocialAccountService(
                         "any company. Please contact administrator"
             )
         }
-        val exitingAccount = socialAccountRepository.findByAccountId(
-            registerSocialAccount.id
+        val exitingAccount = socialAccountRepository.findByAccountIdAndIsDeleted(
+            registerSocialAccount.id, false
         )
         if(exitingAccount.isPresent) {
             throw InvalidDataException("Account ID ${registerSocialAccount
@@ -64,8 +66,31 @@ class SocialAccountService(
             signedRequest = registerSocialAccount.signedRequest,
             userID = registerSocialAccount.userID,
             createdBy = keycloakUtils.getCurrentUserName(),
-            modifiedBy = keycloakUtils.getCurrentUserName()
+            modifiedBy = keycloakUtils.getCurrentUserName(),
+            isDeleted = false
         )
         return socialAccountRepository.save(socialAccount)
+    }
+    fun deListSocialAccount(
+        id: String
+    ) {
+        val existingSocialAccount = socialAccountRepository.findById(id)
+        if(!existingSocialAccount.isPresent)
+        {
+            throw InvalidDataException("ID $id does not present")
+        }
+        val currentUsersRoles = keycloakUtils.getCurrentUserRoles()
+
+        if (currentUsersRoles
+                .contains(ApplicationRoles.SALESEAZE_USER.name)
+        ) {
+            throw InvalidDataException("You are not authorized to delist " +
+                    "social account")
+        }
+        val socialAccount = existingSocialAccount.get()
+        socialAccount.isDeleted = true
+        socialAccount.modifiedDate = LocalDateTime.now()
+        socialAccount.modifiedBy = keycloakUtils.getCurrentUserName()
+        socialAccountRepository.save(socialAccount)
     }
 }

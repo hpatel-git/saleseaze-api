@@ -19,5 +19,6 @@ data class SocialAccount(
     val createdDate: LocalDateTime = LocalDateTime.now(),
     val createdBy: String,
     var modifiedDate: LocalDateTime = LocalDateTime.now(),
-    var modifiedBy: String
+    var modifiedBy: String,
+    var isDeleted: Boolean = false
 )

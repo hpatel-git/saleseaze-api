@@ -5,6 +5,10 @@ import org.springframework.data.repository.CrudRepository
 import java.util.Optional
 
 interface SocialAccountRepository: CrudRepository<SocialAccount, String> {
-    fun findAllByCompanyId(companyId: String): List<SocialAccount>
-    fun findByAccountId(accountId: String): Optional<SocialAccount>
+    fun findAllByCompanyIdAndIsDeleted(
+        companyId: String,isDeleted: Boolean
+    ): List<SocialAccount>
+    fun findByAccountIdAndIsDeleted(
+        accountId: String, isDeleted: Boolean
+    ): Optional<SocialAccount>
 }
