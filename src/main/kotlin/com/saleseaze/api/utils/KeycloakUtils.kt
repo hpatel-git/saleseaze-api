@@ -6,8 +6,25 @@ import org.keycloak.adapters.RefreshableKeycloakSecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 
+@Suppress("UNCHECKED_CAST")
 @Component
 class KeycloakUtils {
+
+    fun getCurrentUserId() : String {
+        if (SecurityContextHolder.getContext().authentication.principal is
+                    KeycloakPrincipal<*>
+        ) {
+            val principal: KeycloakPrincipal<RefreshableKeycloakSecurityContext> =
+                SecurityContextHolder
+                    .getContext()
+                    .authentication
+                    .principal as KeycloakPrincipal<RefreshableKeycloakSecurityContext>
+            return principal
+                .keycloakSecurityContext.token.subject
+
+        }
+        return ""
+    }
     fun getCurrentUserName() : String {
         if (SecurityContextHolder.getContext().authentication.principal is
                     KeycloakPrincipal<*>
@@ -17,7 +34,8 @@ class KeycloakUtils {
                     .getContext()
                     .authentication
                     .principal as KeycloakPrincipal<RefreshableKeycloakSecurityContext>
-
+            principal
+                .keycloakSecurityContext.token.subject
             return AdapterUtils.getPrincipalName(
                 principal
                     .keycloakSecurityContext.deployment, principal

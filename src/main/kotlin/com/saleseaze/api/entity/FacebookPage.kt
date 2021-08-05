@@ -1,5 +1,6 @@
 package com.saleseaze.api.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.saleseaze.api.model.fb.FBPageCategory
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
@@ -9,6 +10,7 @@ data class FacebookPage(
     val id: String? = null,
     val accountId: String,
     val companyId: String,
+    @JsonIgnore
     var accessToken: String,
     var category: String,
     var name: String,

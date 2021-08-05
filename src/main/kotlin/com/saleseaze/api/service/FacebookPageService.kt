@@ -4,7 +4,6 @@ import com.saleseaze.api.client.FacebookClient
 import com.saleseaze.api.entity.FacebookPage
 import com.saleseaze.api.exception.InvalidDataException
 import com.saleseaze.api.repository.FacebookPageRepository
-import com.saleseaze.api.utils.KeycloakUtils
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -13,7 +12,7 @@ import java.time.LocalDateTime
 class FacebookPageService(
     private val facebookPageRepository: FacebookPageRepository,
     private val facebookClient: FacebookClient,
-    private val keycloakUtils: KeycloakUtils
+    private val commonService: CommonService
 ) {
 
     fun syncFacebookPages(
@@ -42,7 +41,7 @@ class FacebookPageService(
                         facebookExistingPage.categoryList = pageDetail
                             .categoryList
                         facebookExistingPage.modifiedBy =
-                            keycloakUtils.getCurrentUserName()
+                            commonService.getCurrentUserName()
                         facebookExistingPage.modifiedDate = LocalDateTime.now()
                         facebookPageRepository.save(facebookExistingPage)
 
@@ -56,8 +55,8 @@ class FacebookPageService(
                             name = pageDetail.name,
                             tasks = pageDetail.tasks,
                             categoryList = pageDetail.categoryList,
-                            createdBy = keycloakUtils.getCurrentUserName(),
-                            modifiedBy = keycloakUtils.getCurrentUserName()
+                            createdBy = commonService.getCurrentUserName(),
+                            modifiedBy = commonService.getCurrentUserName()
                         )
                         facebookPageRepository.save(facebookPage)
                     }
@@ -69,5 +68,13 @@ class FacebookPageService(
                         " code ${pageResponse.statusCode.reasonPhrase}"
             )
         }
+    }
+
+    fun fetchPagesByAccountId(accountId: String): List<FacebookPage> {
+        val companyId = commonService.getCurrentUserCompanyId()
+        return facebookPageRepository.findAllByAccountIdAndCompanyId(
+            accountId,
+            companyId
+        )
     }
 }

@@ -1,5 +1,6 @@
 package com.saleseaze.api.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
@@ -12,9 +13,12 @@ data class SocialAccount(
     val name: String,
     val companyId: String,
     val accountId: String,
+    @JsonIgnore
     val accessToken: String,
+    @JsonIgnore
     val longLivedAccessToken: String,
     val userID: String,
+    @JsonIgnore
     val signedRequest: String,
     val graphDomain: String,
     val createdDate: LocalDateTime = LocalDateTime.now(),
