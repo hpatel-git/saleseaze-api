@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 import java.util.UUID
 
-@Document
+@Document("social_account")
 data class SocialAccount(
     @Id
     val id: String? = null,
@@ -13,6 +13,7 @@ data class SocialAccount(
     val companyId: String,
     val accountId: String,
     val accessToken: String,
+    val longLivedAccessToken: String,
     val userID: String,
     val signedRequest: String,
     val graphDomain: String,

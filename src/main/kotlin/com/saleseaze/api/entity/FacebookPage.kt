@@ -1,21 +1,22 @@
 package com.saleseaze.api.entity
 
-import org.springframework.data.annotation.Id
+import com.saleseaze.api.model.fb.FBPageCategory
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
-import java.util.UUID
 
-@Document("company")
-data class Company(
-    @Id
+@Document("facebook_page")
+data class FacebookPage(
     val id: String? = null,
-    val companyName: String,
-    var address: String,
-    var city: String,
-    var country: String,
-    var postalCode: String,
+    val accountId: String,
+    val companyId: String,
+    var accessToken: String,
+    var category: String,
+    var name: String,
+    var tasks: List<String>,
+    var categoryList: List<FBPageCategory>,
     val createdDate: LocalDateTime = LocalDateTime.now(),
     val createdBy: String,
     var modifiedDate: LocalDateTime = LocalDateTime.now(),
     var modifiedBy: String
 )
+

@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 import java.util.UUID
 
-@Document
+@Document("user_company_mapping")
 data class UserCompanyMapping(
     @Id
     val id: String? = null,

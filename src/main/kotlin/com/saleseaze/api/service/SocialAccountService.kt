@@ -1,5 +1,6 @@
 package com.saleseaze.api.service
 
+import com.saleseaze.api.client.FacebookClient
 import com.saleseaze.api.entity.SocialAccount
 import com.saleseaze.api.exception.InvalidDataException
 import com.saleseaze.api.model.RegisterSocialAccount
@@ -7,6 +8,7 @@ import com.saleseaze.api.repository.SocialAccountRepository
 import com.saleseaze.api.utils.ApplicationRoles
 import com.saleseaze.api.utils.KeycloakUtils
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -14,7 +16,9 @@ import java.time.LocalDateTime
 class SocialAccountService(
     private val userProfileService: UserProfileService,
     private val socialAccountRepository: SocialAccountRepository,
-    private val keycloakUtils: KeycloakUtils
+    private val keycloakUtils: KeycloakUtils,
+    private val facebookClient: FacebookClient,
+    private val facebookPageService: FacebookPageService
 ) {
 
     fun fetchRegisteredSocialAccounts(userId: String): List<SocialAccount> {
@@ -57,17 +61,32 @@ class SocialAccountService(
             throw InvalidDataException("Account ID ${registerSocialAccount
                 .id} already present")
         }
+        val longLivedUserAccessTokenRes = facebookClient
+            .generateLongLivedUserAccessToken(registerSocialAccount.accessToken)
+        if(longLivedUserAccessTokenRes.statusCode != HttpStatus.OK) {
+            throw InvalidDataException("Facebook Graph API is throwing " +
+                    "${longLivedUserAccessTokenRes.statusCode.reasonPhrase} " +
+                    " ")
+        }
         val socialAccount = SocialAccount(
             name = registerSocialAccount.name,
             accountId = registerSocialAccount.id,
             companyId = userProfile.company!!.id!!,
             accessToken = registerSocialAccount.accessToken,
+            longLivedAccessToken = longLivedUserAccessTokenRes.body!!.accessToken,
             graphDomain = registerSocialAccount.graphDomain,
             signedRequest = registerSocialAccount.signedRequest,
             userID = registerSocialAccount.userID,
             createdBy = keycloakUtils.getCurrentUserName(),
             modifiedBy = keycloakUtils.getCurrentUserName(),
             isDeleted = false
+        )
+
+        facebookPageService.syncFacebookPages(
+            socialAccount.longLivedAccessToken,
+            socialAccount.userID,
+            socialAccount.companyId,
+            socialAccount.accountId
         )
         return socialAccountRepository.save(socialAccount)
     }
