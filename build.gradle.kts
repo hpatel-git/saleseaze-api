@@ -39,6 +39,7 @@ dependencies {
 
     implementation("io.github.microutils:kotlin-logging:1.12.5")
 
+    implementation("com.github.siyoon210:ogparser4j:1.0.1")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
