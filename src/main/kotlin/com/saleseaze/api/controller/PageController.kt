@@ -21,7 +21,7 @@ class PageController(
         )]
     )
     @GetMapping
-    fun fetchRegisteredSocialAccounts(
+    fun fetchAccountPages(
         @PathVariable("accountId") accountId: String
     ) = facebookPageService.fetchPagesByAccountId(
         accountId

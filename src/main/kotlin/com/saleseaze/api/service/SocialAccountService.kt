@@ -54,19 +54,26 @@ class SocialAccountService(
                         "any company. Please contact administrator"
             )
         }
-        val exitingAccount = socialAccountRepository.findByAccountIdAndIsDeleted(
-            registerSocialAccount.id, false
-        )
-        if(exitingAccount.isPresent) {
-            throw InvalidDataException("Account ID ${registerSocialAccount
-                .id} already present")
+        val exitingAccount =
+            socialAccountRepository.findByAccountIdAndIsDeleted(
+                registerSocialAccount.id, false
+            )
+        if (exitingAccount.isPresent) {
+            throw InvalidDataException(
+                "Account ID ${
+                    registerSocialAccount
+                        .id
+                } already present"
+            )
         }
         val longLivedUserAccessTokenRes = facebookClient
             .generateLongLivedUserAccessToken(registerSocialAccount.accessToken)
-        if(longLivedUserAccessTokenRes.statusCode != HttpStatus.OK) {
-            throw InvalidDataException("Facebook Graph API is throwing " +
-                    "${longLivedUserAccessTokenRes.statusCode.reasonPhrase} " +
-                    " ")
+        if (longLivedUserAccessTokenRes.statusCode != HttpStatus.OK) {
+            throw InvalidDataException(
+                "Facebook Graph API is throwing " +
+                        "${longLivedUserAccessTokenRes.statusCode.reasonPhrase} " +
+                        " "
+            )
         }
         val socialAccount = SocialAccount(
             name = registerSocialAccount.name,
@@ -90,12 +97,12 @@ class SocialAccountService(
         )
         return socialAccountRepository.save(socialAccount)
     }
+
     fun deListSocialAccount(
         id: String
     ) {
         val existingSocialAccount = socialAccountRepository.findById(id)
-        if(!existingSocialAccount.isPresent)
-        {
+        if (!existingSocialAccount.isPresent) {
             throw InvalidDataException("ID $id does not present")
         }
         val currentUsersRoles = keycloakUtils.getCurrentUserRoles()
@@ -103,13 +110,32 @@ class SocialAccountService(
         if (currentUsersRoles
                 .contains(ApplicationRoles.SALESEAZE_USER.name)
         ) {
-            throw InvalidDataException("You are not authorized to delist " +
-                    "social account")
+            throw InvalidDataException(
+                "You are not authorized to delist " +
+                        "social account"
+            )
         }
         val socialAccount = existingSocialAccount.get()
         socialAccount.isDeleted = true
         socialAccount.modifiedDate = LocalDateTime.now()
         socialAccount.modifiedBy = keycloakUtils.getCurrentUserName()
         socialAccountRepository.save(socialAccount)
+    }
+
+    fun initiateSync(id: String) {
+        val socialAccountOptional = socialAccountRepository
+            .findByAccountIdAndIsDeleted(id, false)
+        if (!socialAccountOptional.isPresent) {
+            throw InvalidDataException(
+                "Account ID $id not present"
+            )
+        }
+        val socialAccount = socialAccountOptional.get()
+        facebookPageService.syncFacebookPages(
+            socialAccount.longLivedAccessToken,
+            socialAccount.userID,
+            socialAccount.companyId,
+            socialAccount.accountId
+        )
     }
 }
