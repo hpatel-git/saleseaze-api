@@ -29,4 +29,13 @@ class PublishPostController(
         @RequestBody publishPostRequest: PublishPostRequest
     ) = publishPostService.publishPost(publishPostRequest)
 
+    @Operation(
+        security = [SecurityRequirement(
+            name = ApplicationConstants.BEARER_KEY_SECURITY_SCHEME
+        )]
+    )
+    @GetMapping
+    fun findAllByCompanyId(
+    ) = publishPostService.findAllByCompanyId()
+
 }

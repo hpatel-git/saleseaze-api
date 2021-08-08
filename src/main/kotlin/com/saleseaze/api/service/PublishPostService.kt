@@ -35,6 +35,9 @@ class PublishPostService(
                 companyId = it.companyId,
                 message = publishPostRequest.message,
                 link = publishPostRequest.link,
+                ogImage= publishPostRequest.ogImage,
+                ogTitle= publishPostRequest.ogTitle,
+                ogDescription= publishPostRequest.ogDescription,
                 pageId= it.id!!,
                 createdBy = commonService.getCurrentUserName(),
                 createdDate = LocalDateTime.now(),
@@ -64,6 +67,11 @@ class PublishPostService(
             publishPost = publishPostRepository.save(publishPost)
             publishPost
         }
+    }
+
+    fun findAllByCompanyId(): List<PublishPost> {
+        val currentCompany = commonService.getCurrentUserCompanyId()
+        return publishPostRepository.findAllByCompanyId(currentCompany)
     }
 
 }
