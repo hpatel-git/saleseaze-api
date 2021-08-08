@@ -15,6 +15,7 @@ class FacebookClient(
     val restTemplate: RestTemplate,
     val facebookConfig: FacebookConfig
 ) {
+    @Retryable(value = [Exception::class], maxAttempts = 5)
     fun generateLongLivedUserAccessToken(accessToken: String): ResponseEntity<FBUserAccessTokenResponse> {
         val baseUrl =
             "${facebookConfig.baseUrl}/${
@@ -35,7 +36,7 @@ class FacebookClient(
         )
 
     }
-
+    @Retryable(value = [Exception::class], maxAttempts = 5)
     fun generateLongLivedPageAccessToken(
         longLivedUserAccessToken: String,
         userId: String
@@ -52,7 +53,7 @@ class FacebookClient(
         )
     }
 
-    @Retryable(value = [Exception::class])
+    @Retryable(value = [Exception::class], maxAttempts = 5)
     fun publishFeed(
         longLivedPageAccessToken: String,
         pageId: String,
