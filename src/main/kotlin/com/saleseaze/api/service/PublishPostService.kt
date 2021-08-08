@@ -7,6 +7,8 @@ import com.saleseaze.api.exception.InvalidDataException
 import com.saleseaze.api.model.PublishPostRequest
 import com.saleseaze.api.repository.FacebookPageRepository
 import com.saleseaze.api.repository.PublishPostRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -69,9 +71,9 @@ class PublishPostService(
         }
     }
 
-    fun findAllByCompanyId(): List<PublishPost> {
+    fun findAllByCompanyId(pageRequest: PageRequest): Page<PublishPost> {
         val currentCompany = commonService.getCurrentUserCompanyId()
-        return publishPostRepository.findAllByCompanyId(currentCompany)
+        return publishPostRepository.findAllByCompanyId(currentCompany, pageRequest)
     }
 
 }

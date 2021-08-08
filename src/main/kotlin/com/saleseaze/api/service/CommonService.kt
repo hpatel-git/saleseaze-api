@@ -22,7 +22,8 @@ class CommonService(
             ?: throw InvalidDataException(
                 "User ${keycloakUtils.getCurrentUserId()} does not exists"
             )
-        if (userProfile.attributes.containsKey(ApplicationConstants.USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY)
+        if (userProfile.attributes != null && userProfile.attributes.containsKey
+                (ApplicationConstants.USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY)
         ) {
             return userProfile
                 .attributes[ApplicationConstants.USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY]?.get(
