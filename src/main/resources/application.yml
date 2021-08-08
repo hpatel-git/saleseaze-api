@@ -40,6 +40,8 @@ facebook:
   client-secret: df44b1eb7bb25e1934bde8ddbbd347d0
   api-version: v11.0
   base-url: https://graph.facebook.com
+  retry-max-attempts: 5
+  retry-max-delay: 100
 
 keycloak-admin:
   user-name: ${KEYCLOAK_ADMIN_USER_NAME:admin}

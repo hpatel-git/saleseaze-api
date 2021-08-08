@@ -9,5 +9,7 @@ data class FacebookConfig(
     val clientId: String,
     val clientSecret: String,
     val apiVersion: String,
-    val baseUrl: String
+    val baseUrl: String,
+    val retryMaxAttempts: Int,
+    val retryMaxDelay: Int
 )

@@ -5,6 +5,7 @@ import com.saleseaze.api.model.fb.FBPageResponse
 import com.saleseaze.api.model.fb.FBPostResponse
 import com.saleseaze.api.model.fb.FBUserAccessTokenResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.net.URLDecoder
@@ -50,6 +51,8 @@ class FacebookClient(
             FBPageResponse::class.java
         )
     }
+
+    @Retryable(value = [Exception::class])
     fun publishFeed(
         longLivedPageAccessToken: String,
         pageId: String,
