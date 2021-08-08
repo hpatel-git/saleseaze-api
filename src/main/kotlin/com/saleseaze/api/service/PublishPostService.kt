@@ -23,7 +23,7 @@ class PublishPostService(
 
     fun publishPost(publishPostRequest: PublishPostRequest): List<PublishPost> {
         val pageIds = facebookPageRepository.findAllById(
-            publishPostRequest
+             publishPostRequest
                 .pageIds
         )
         pageIds.forEach {
@@ -40,6 +40,7 @@ class PublishPostService(
                 ogImage= publishPostRequest.ogImage,
                 ogTitle= publishPostRequest.ogTitle,
                 ogDescription= publishPostRequest.ogDescription,
+                ogSiteName = publishPostRequest.ogSiteName,
                 pageId= it.id!!,
                 createdBy = commonService.getCurrentUserName(),
                 createdDate = LocalDateTime.now(),

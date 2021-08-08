@@ -19,6 +19,7 @@ data class PublishPost(
     val ogImage: String?,
     val ogTitle: String?,
     val ogDescription: String?,
+    val ogSiteName: String?,
     var response: Any? = null,
     var responseStatus: String? = null,
     var status:PublishStatus = PublishStatus.IN_PROCESS,

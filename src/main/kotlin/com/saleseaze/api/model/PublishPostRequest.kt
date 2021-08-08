@@ -7,5 +7,6 @@ data class PublishPostRequest(
     var pageIds: List<String>,
     val ogImage: String?,
     val ogTitle: String?,
-    val ogDescription: String?
+    val ogDescription: String?,
+    val ogSiteName: String?
 )
