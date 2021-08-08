@@ -51,7 +51,7 @@ class PublishPostService(
                 )
                 publishPost.responseStatus = response.statusCode.reasonPhrase
                 if(response.statusCode == HttpStatus.OK) {
-                    publishPost.status = PublishStatus.ERROR
+                    publishPost.status = PublishStatus.SUCCESS
                     publishPost.response = response.body
                 } else {
                     publishPost.status = PublishStatus.ERROR

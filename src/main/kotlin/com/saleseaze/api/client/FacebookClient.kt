@@ -7,7 +7,7 @@ import com.saleseaze.api.model.fb.FBUserAccessTokenResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import java.lang.StringBuilder
+import java.net.URLDecoder
 
 @Service
 class FacebookClient(
@@ -59,13 +59,14 @@ class FacebookClient(
         val query = StringBuilder()
         query.append("message=$message")
         link?.let {
-            query.append("&link=$link")
+            query.append("&link=${URLDecoder.decode(it, "UTF-8")}")
         }
         val baseUrl =
             "${facebookConfig.baseUrl}/$pageId/feed?access_token" +
                     "=$longLivedPageAccessToken&$query"
-        return restTemplate.getForEntity(
+        return restTemplate.postForEntity(
             baseUrl,
+            "",
             FBPostResponse::class.java
         )
     }
