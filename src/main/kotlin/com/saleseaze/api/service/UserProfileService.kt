@@ -38,7 +38,7 @@ class UserProfileService(
             userProfile = userProfile
         )
 
-        if (userProfile.attributes.containsKey
+        if (userProfile.attributes != null && userProfile.attributes.containsKey
                 (USER_EXTRA_ATTRIBUTE_ASSIGNED_COMPANY)
         ) {
             val companyId = userProfile
