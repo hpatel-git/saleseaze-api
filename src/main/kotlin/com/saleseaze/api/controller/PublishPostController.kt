@@ -41,7 +41,7 @@ class PublishPostController(
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam(
             "direction",
-            defaultValue = "ASC"
+            defaultValue = "DESC"
         ) direction: Sort.Direction,
         @RequestParam(
             "direction",
