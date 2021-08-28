@@ -43,6 +43,16 @@ facebook:
   retry-max-attempts: 5
   retry-max-delay: 100
 
+storage:
+  api-key: 765198756439666
+  api-secret: ENC(ATVWM1McdUAq3cqVlMGc1HXZPEi4Twp672jTo1fhOgid8QFgNiPr7g==)
+  cloud-name: saleseaze
+
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+
 keycloak-admin:
   user-name: ${KEYCLOAK_ADMIN_USER_NAME:admin}
   pwd: ${KEYCLOAK_ADMIN_PWD:admin}

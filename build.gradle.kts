@@ -29,6 +29,13 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework:spring-aspects")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    //For Gradle, add to dependencies section of build.gradle
+
+    // https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http44
+    implementation("com.cloudinary:cloudinary-http44:1.29.0")
+    // https://mvnrepository.com/artifact/com.github.ulisesbocchio/jasypt-spring-boot-starter
+    implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3")
+
 
     implementation("org.keycloak:keycloak-spring-boot-starter")
     implementation("org.keycloak:keycloak-admin-client:${keycloakVersion}")
