@@ -2,6 +2,12 @@ server:
   port: 8900
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
   application:
     name: saleseaze-api
   data:
